@@ -10,21 +10,29 @@ const { STATUS_CODES, API_URLS } = require("./constants.js");
 router.use(express.json());
 
 router.post(API_URLS.LOGIN, async (req, res) => {
-  const { username, password } = req.body;
+  const { username, password, email, phonenumber } = req.body;
 
-  if (!username || !password) {
+  if ((!username && !email && !phonenumber) || !password) {
     return res
       .status(STATUS_CODES.BAD_REQUEST)
       .json({ message: "Missing required fields." });
   }
 
   try {
-    const loginUser = await userModel.findOne({ username });
+    let loginUser;
+
+    if (username) {
+      loginUser = await userModel.findOne({ username });
+    } else if (email) {
+      loginUser = await userModel.findOne({ email });
+    } else if (phonenumber) {
+      loginUser = await userModel.findOne({ phonenumber });
+    }
 
     if (!loginUser) {
       return res
         .status(STATUS_CODES.BAD_REQUEST)
-        .json({ message: "Invalid username." });
+        .json({ message: "Invalid input credentials." });
     }
 
     const isMatch = await bcrypt.compare(password, loginUser.password);

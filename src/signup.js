@@ -14,12 +14,16 @@ router.post(API_URLS.SIGNUP, async (req, res) => {
 
   try {
     const existingUser = await userModel.findOne({
-      $or: [{ email: email }, { username: username }],
+      $or: [
+        { email: email },
+        { username: username },
+        { phonenumber: phonenumber },
+      ],
     });
     if (existingUser) {
       return res
         .status(STATUS_CODES.BAD_REQUEST)
-        .send({ message: "User with this email or username already exists." });
+        .send({ message: "User with these detail already exists." });
     }
 
     const salt = await bcrypt.genSalt(10);
@@ -28,11 +32,12 @@ router.post(API_URLS.SIGNUP, async (req, res) => {
     let createdUser = await userModel.create({
       email: email,
       username: username,
+      phonenumber: phonenumber,
       password: hashedPassword,
     });
-    res
-      .status(STATUS_CODES.CREATED)
-      .json({ message: `User ${createdUser.username} created successfully` });
+    res.status(STATUS_CODES.CREATED).json({
+      message: `User with username (${createdUser.username}) created successfully`,
+    });
   } catch (error) {
     res
       .status(STATUS_CODES.INTERNAL_SERVER_ERROR)

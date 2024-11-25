@@ -15,6 +15,7 @@ const STATUS_CODES = {
 const API_URLS = {
   LOGIN: "/login",
   SIGNUP: "/signup",
+  GUEST: "/guest",
 };
 
 module.exports = { STATUS_CODES, API_URLS, PORTS };
